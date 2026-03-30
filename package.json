@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "name": "mathyblitz",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "deploy": "npm run type-check && devvit upload",
+    "dev": "devvit playtest",
+    "launch": "npm run deploy && devvit publish",
+    "login": "devvit login",
+    "type-check": "tsc --build",
+    "update-questions": "node tools/updateQuestions.js"
+  },
+  "engines": {
+    "node": ">=22.2.0"
+  },
+  "dependencies": {
+    "@devvit/start": "0.12.12",
+    "@devvit/web": "0.12.12",
+    "@hono/node-server": "^1.19.9",
+    "devvit": "0.12.12",
+    "hono": "4.11.7",
+    "katex": "^0.16.38",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.8",
+    "@types/node": "^22.19.7",
+    "@types/react": "19.2.10",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.2",
+    "typescript": "5.9.3",
+    "vite": "7.3.1"
+  }
+}
