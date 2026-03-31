@@ -188,6 +188,9 @@ const App = () => {
 
   const [visitStreak, setVisitStreak] = useState(0);
   const [soundOn, setSoundOn] = useState(_soundEnabled);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    try { return localStorage.getItem('mb_tutorial_seen') !== '1'; } catch { return false; }
+  });
 
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -224,6 +227,17 @@ const App = () => {
     const { streak } = updateDailyStreak(dayIndex);
     setVisitStreak(streak);
   }, [dayIndex]);
+
+  // ── Tutorial auto-dismiss ─────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!showTutorial) return;
+    const t = setTimeout(() => {
+      setShowTutorial(false);
+      try { localStorage.setItem('mb_tutorial_seen', '1'); } catch { /* ignore */ }
+    }, 4500);
+    return () => clearTimeout(t);
+  }, [showTutorial]);
 
   // ── Countdown ────────────────────────────────────────────────────────────
 
@@ -584,6 +598,7 @@ const App = () => {
         @keyframes gradeGlow { 0% { text-shadow: 0 0 10px currentColor; } 50% { text-shadow: 0 0 25px currentColor, 0 0 50px currentColor; } 100% { text-shadow: 0 0 10px currentColor; } }
         @keyframes freezePulse { 0%,100% { box-shadow: 0 0 15px rgba(56,189,248,0.2); } 50% { box-shadow: 0 0 30px rgba(56,189,248,0.5); } }
         @keyframes factSlide { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+        @keyframes tutorialBar { from { width:0%; } to { width:100%; } }
         .opt-btn { transition: all 0.2s ease; }
         .opt-btn:active { transform: scale(0.97); }
         .opt-btn:hover { background: rgba(255,255,255,0.06) !important; border-color: rgba(139,92,246,0.3) !important; }
@@ -598,7 +613,7 @@ const App = () => {
         .diff-btn { transition: all 0.2s ease; }
         .diff-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important; }
         .diff-btn:active { transform: translateY(0); }
-        .lifeline-btn { transition: all 0.15s ease; }
+        .lifeline-btn { transition: all 0.15s ease; min-height: 36px; }
         .lifeline-btn:hover:not(:disabled) { transform: scale(1.05); }
         .lifeline-btn:active:not(:disabled) { transform: scale(0.95); }
         .lifeline-btn:disabled { opacity: 0.25; cursor: not-allowed !important; }
@@ -617,6 +632,51 @@ const App = () => {
         background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)',
         borderRadius: '50%', pointerEvents: 'none', animation: 'drift 12s ease-in-out infinite',
       }} />
+
+      {/* ── First-time Tutorial Overlay ── */}
+      {showTutorial && phase === 'menu' && (
+        <div
+          onClick={() => { setShowTutorial(false); try { localStorage.setItem('mb_tutorial_seen', '1'); } catch { /* ignore */ } }}
+          style={{
+            position: 'absolute', inset: 0, zIndex: 100,
+            background: 'rgba(7,7,15,0.92)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: '18px', padding: '30px',
+            animation: 'fadeIn 0.4s ease',
+          }}
+        >
+          <div style={{ fontSize: '11px', letterSpacing: '4px', color: '#4b5079', fontWeight: 700 }}>HOW TO PLAY</div>
+          {([
+            ['①', '#818cf8', 'Pick a difficulty or tap Today\'s Mission'],
+            ['②', '#10b981', 'Answer 4-choice questions before time runs out'],
+            ['③', '#f59e0b', 'Use lifelines wisely — each one is limited'],
+          ] as [string, string, string][]).map(([n, c, txt]) => (
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: '14px', maxWidth: '280px', width: '100%' }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
+                background: `${c}18`, border: `1px solid ${c}40`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '16px', color: c, fontWeight: 800,
+                animation: 'pulse 1.5s infinite',
+              }}>{n}</div>
+              <div style={{ fontSize: '13px', color: '#c7d2fe', lineHeight: 1.4, fontWeight: 500 }}>{txt}</div>
+            </div>
+          ))}
+          <div style={{ marginTop: '10px', fontSize: '10px', color: '#2a2d4a', letterSpacing: '2px' }}>
+            TAP ANYWHERE TO DISMISS
+          </div>
+          <div style={{
+            width: '120px', height: '3px', borderRadius: '2px',
+            background: 'rgba(255,255,255,0.05)', overflow: 'hidden', marginTop: '4px',
+          }}>
+            <div style={{
+              height: '100%', borderRadius: '2px',
+              background: 'linear-gradient(90deg, #818cf8, #c084fc)',
+              animation: 'tutorialBar 4.5s linear forwards',
+            }} />
+          </div>
+        </div>
+      )}
 
       {/* ── Loading ── */}
       {phase === 'loading' && (
@@ -1097,11 +1157,11 @@ const App = () => {
                 className="opt-btn"
                 onClick={() => { if (feedback === 'none' && !hiddenOpts.has(opt)) handleAnswer(opt); }}
                 style={{
-                  padding: '12px 8px',
+                  padding: '14px 8px',
                   borderRadius: '14px',
                   border: '1px solid',
                   cursor: feedback === 'none' && !hiddenOpts.has(opt) ? 'pointer' : 'default',
-                  minHeight: '48px',
+                  minHeight: '52px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1131,6 +1191,17 @@ const App = () => {
               {feedback === 'correct' && <span>CORRECT {isDoubleActive ? '' : ''}{questionScores.length > 0 ? `+${questionScores[questionScores.length - 1]}` : ''}</span>}
               {feedback === 'wrong'   && <span>WRONG &#8212; {problem.latex ? <MathInline tex={problem.answer} /> : problem.answer}</span>}
               {feedback === 'timeout' && <span>TIME UP &#8212; {problem.latex ? <MathInline tex={problem.answer} /> : problem.answer}</span>}
+            </div>
+          )}
+
+          {/* Persistent instruction bar */}
+          {feedback === 'none' && (
+            <div style={{
+              textAlign: 'center', marginTop: '5px',
+              fontSize: '9px', letterSpacing: '2px', fontWeight: 600,
+              color: '#2a2d4a',
+            }}>
+              TAP AN ANSWER &nbsp;&#xB7;&nbsp; {currentIdx + 1} OF {questionCount}
             </div>
           )}
         </div>

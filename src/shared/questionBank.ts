@@ -95,6 +95,18 @@ export const EASY_PROBLEMS: Problem[] = [
     hint: "Differences: 4, 6, 8, 10, ...", explanation: "Differences increase by 2: +4,+6,+8,+10,+12. 31+12=43" },
   { question: "\\text{Next: } 3, 6, 9, 12, \\text{ ?}", options: ["15", "14", "18", "13"], answer: "15", category: "Patterns", latex: true,
     hint: "Add 3 each time", explanation: "12 + 3 = 15" },
+
+  // ── Word Problems & Logic (Easy) ───────────────────────────────────────────
+  { question: "\\text{Alice has \\$45. She earns \\$12 babysitting. She spends \\$18. How much left?}", options: ["$39", "$57", "$33", "$27"], answer: "$39", category: "Word Problems", latex: true,
+    hint: "Start: 45. Add earnings, subtract spending.", explanation: "$45 + $12 - $18 = $39" },
+  { question: "\\text{A car travels 60 km in 1.5 hours. Speed in km/h?}", options: ["40", "45", "50", "90"], answer: "40", category: "Word Problems", latex: true,
+    hint: "Speed = distance ÷ time", explanation: "60 ÷ 1.5 = 40 km/h" },
+  { question: "\\text{A bag has 3 red, 5 blue, 2 green marbles. P(red)?}", options: ["3/10", "1/3", "3/5", "1/5"], answer: "3/10", category: "Probability", latex: true,
+    hint: "Probability = favourable / total", explanation: "Total = 10. P(red) = 3/10" },
+  { question: "\\text{Tom is twice Ali's age. Together they are 36. Tom's age?}", options: ["24", "18", "12", "20"], answer: "24", category: "Logic", latex: true,
+    hint: "Let Ali = x, Tom = 2x. Sum = 36.", explanation: "3x = 36 → x = 12. Tom = 24" },
+  { question: "\\text{A rectangle's perimeter is 34. Width is 7. Length?}", options: ["10", "13", "17", "20"], answer: "10", category: "Geometry", latex: true,
+    hint: "P = 2(l + w). Solve for l.", explanation: "34 = 2(l + 7) → l + 7 = 17 → l = 10" },
 ];
 
 export const MEDIUM_PROBLEMS: Problem[] = [
@@ -203,6 +215,20 @@ export const MEDIUM_PROBLEMS: Problem[] = [
     hint: "Which value appears most often?", explanation: "5 appears twice. Mode = 5" },
   { question: "\\text{Scores: 70, 80, 90, 100. Weighted avg (30, 20, 30, 20)?}", options: ["82", "85", "80", "88"], answer: "82", category: "Statistics", latex: true,
     hint: "Sum(score × weight) / 100", explanation: "70×30 + 80×20 + 90×30 + 100×20 = 8200. /100 = 82" },
+
+  // ── Problem Solving / Logic (Medium) ──────────────────────────────────────
+  { question: "\\text{Two pipes fill a tank in 4h and 6h. Together?}", options: ["2.4 hrs", "2 hrs", "5 hrs", "3 hrs"], answer: "2.4 hrs", category: "Logic", latex: true,
+    hint: "1/4 + 1/6 = 1/T. Find T.", explanation: "Rate = 1/4 + 1/6 = 5/12 per hr. T = 12/5 = 2.4 hours" },
+  { question: "\\text{A tank is 40\\% full. Adding 30L makes it 70\\%. Capacity?}", options: ["100 L", "75 L", "120 L", "90 L"], answer: "100 L", category: "Word Problems", latex: true,
+    hint: "30% of capacity = 30 L", explanation: "0.30 × C = 30. C = 100 L" },
+  { question: "\\text{Cost \\$100, marked up 50\\%, then 20\\% discount. Profit?}", options: ["$20", "$30", "$50", "$10"], answer: "$20", category: "Finance", latex: true,
+    hint: "Sell price = 100 × 1.5 × 0.8", explanation: "$100 × 1.5 = $150. $150 × 0.8 = $120. Profit = $120 - $100 = $20" },
+  { question: "\\text{If } 3x - 7 = 2(x + 4), \\text{ find } x.", options: ["15", "9", "1", "7"], answer: "15", category: "Algebra", latex: true,
+    hint: "Expand, collect x terms on one side.", explanation: "3x - 7 = 2x + 8 → x = 15" },
+  { question: "\\text{A train 200m long passes a pole in 10s. Speed in m/s?}", options: ["20", "25", "10", "40"], answer: "20", category: "Word Problems", latex: true,
+    hint: "Speed = length ÷ time", explanation: "200 m ÷ 10 s = 20 m/s" },
+  { question: "\\text{P(A)=0.4, P(B)=0.5, independent. P(A and B)?}", options: ["0.2", "0.9", "0.45", "0.1"], answer: "0.2", category: "Probability", latex: true,
+    hint: "P(A∩B) = P(A) × P(B) for independent events", explanation: "0.4 × 0.5 = 0.2" },
 ];
 
 export const HARD_PROBLEMS: Problem[] = [
@@ -311,4 +337,16 @@ export const HARD_PROBLEMS: Problem[] = [
     hint: "P(A∪B) = P(A) + P(B) - P(A∩B)", explanation: "0.6 + 0.5 - 0.3 = 0.8" },
   { question: "\\text{Roll two dice. P(sum = 7)?}", options: ["1/6", "1/4", "1/5", "1/8"], answer: "1/6", category: "Probability", latex: true,
     hint: "How many pairs (a,b) sum to 7 out of 36?", explanation: "6 pairs sum to 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1). P = 6/36 = 1/6" },
+
+  // ── Hard Problem Solving / Logic ───────────────────────────────────────────
+  { question: "\\text{A and B run a 1km race. A beats B by 100m. Then A gives B a 100m head start. Who wins?}", options: ["A wins", "B wins", "Tie", "Cannot tell"], answer: "A wins", category: "Logic", latex: true,
+    hint: "When B has run 900m, A runs 1000m. With 100m start, when B runs 1000m, how far does A run?", explanation: "A's speed ratio = 1000:900 = 10:9. With head start: A runs 900m while B runs 900m, so A arrives first. A wins." },
+  { question: "\\text{5 workers complete a job in 12 days. How many days for 9 workers?}", options: ["6.67 days", "8 days", "10 days", "4 days"], answer: "6.67 days", category: "Word Problems", latex: true,
+    hint: "Inverse proportion: workers × days = constant", explanation: "5 × 12 = 60 worker-days. 60 ÷ 9 = 6.67 days" },
+  { question: "\\text{A ladder 10m long leans against a wall. Base is 6m from wall. Height reached?}", options: ["8 m", "7 m", "9 m", "6 m"], answer: "8 m", category: "Logic", latex: true,
+    hint: "Pythagorean theorem: a² + b² = c²", explanation: "h² + 6² = 10². h² = 100 - 36 = 64. h = 8 m" },
+  { question: "\\text{A 20\\% salt solution + 50\\% salt solution = 30L of 30\\% solution. How much 20\\% solution?}", options: ["20 L", "10 L", "15 L", "25 L"], answer: "20 L", category: "Algebra", latex: true,
+    hint: "Let x = amount of 20% solution. Set up: 0.2x + 0.5(30-x) = 0.3(30)", explanation: "0.2x + 15 - 0.5x = 9. -0.3x = -6. x = 20 L" },
+  { question: "\\text{Sequence: } a_n = 2n^2 - 1. \\quad a_5 = ?", options: ["49", "51", "47", "25"], answer: "49", category: "Algebra", latex: true,
+    hint: "Substitute n = 5 into the formula", explanation: "a₅ = 2(5²) - 1 = 2(25) - 1 = 50 - 1 = 49" },
 ];
