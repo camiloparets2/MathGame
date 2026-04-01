@@ -6,15 +6,20 @@ import 'katex/dist/katex.min.css';
 import { getDayIndex, generateProblems, getTodaysMission } from '../shared/problems';
 
 const dayIndex = getDayIndex();
-const sample = generateProblems(dayIndex, 'medium')[0]!;
+const sampleProblems = generateProblems(dayIndex, 'medium');
+// Pick a latex problem for the hero — fallback to first
+const sample = sampleProblems.find(p => p.latex) ?? sampleProblems[0]!;
 const mission = getTodaysMission(dayIndex);
+const username = context.username ?? 'Challenger';
 
-const MathInline = ({ tex }: { tex: string }) => {
+const FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+const MathHero = ({ tex }: { tex: string }) => {
   try {
-    const html = katex.renderToString(tex, { throwOnError: false, displayMode: false, output: 'html' });
+    const html = katex.renderToString(tex, { throwOnError: false, displayMode: true, output: 'html' });
     return <span dangerouslySetInnerHTML={{ __html: html }} />;
   } catch {
-    return <span>{tex}</span>;
+    return <span style={{ whiteSpace: 'pre-line' }}>{tex}</span>;
   }
 };
 
@@ -22,204 +27,187 @@ const Splash = () => (
   <div style={{
     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     height: '100vh',
-    background: '#07070f',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    padding: '20px', textAlign: 'center', userSelect: 'none',
+    background: '#050508',
+    fontFamily: FONT,
+    padding: '16px 20px', textAlign: 'center', userSelect: 'none',
     position: 'relative', overflow: 'hidden',
   }}>
     <style>{`
-      @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
-      @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
-      @keyframes orbit1 { 0% { transform: rotate(0deg) translateX(130px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(130px) rotate(-360deg); } }
-      @keyframes orbit2 { 0% { transform: rotate(120deg) translateX(100px) rotate(-120deg); } 100% { transform: rotate(480deg) translateX(100px) rotate(-480deg); } }
-      @keyframes orbit3 { 0% { transform: rotate(240deg) translateX(160px) rotate(-240deg); } 100% { transform: rotate(600deg) translateX(160px) rotate(-600deg); } }
-      @keyframes drift { 0%,100% { transform: translate(0,0) scale(1); opacity:0.06; } 50% { transform: translate(20px,-15px) scale(1.2); opacity:0.12; } }
-      @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 20px rgba(139,92,246,0.3), 0 0 60px rgba(139,92,246,0.1); } 50% { box-shadow: 0 0 30px rgba(139,92,246,0.5), 0 0 80px rgba(139,92,246,0.2); } }
-      @keyframes scaleIn { from { transform: scale(0.8); opacity:0; } to { transform: scale(1); opacity:1; } }
-      @keyframes missionPulse { 0%,100% { opacity: 0.8; } 50% { opacity: 1; } }
-      .play-btn { transition: transform 0.2s, box-shadow 0.2s; }
-      .play-btn:hover { transform: scale(1.04); }
-      .play-btn:active { transform: scale(0.97); }
-      .katex { font-size: clamp(0.7em, 2.8vw, 0.95em) !important; }
-      .katex-html { white-space: normal !important; word-break: break-word; }
+      @keyframes neonShimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+      @keyframes neonPulse {
+        0%,100% { box-shadow: 0 0 20px rgba(0,229,255,0.35), 0 0 50px rgba(0,229,255,0.12); transform: scale(1); }
+        50%     { box-shadow: 0 0 30px rgba(0,229,255,0.55), 0 0 70px rgba(0,229,255,0.2), 0 0 120px rgba(0,229,255,0.08); transform: scale(1.02); }
+      }
+      @keyframes typeReveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+      @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+      @keyframes cursorBlink { 0%,100% { border-right-color: #00e5ff; } 50% { border-right-color: transparent; } }
+      @keyframes gradeGlow { 0%,100% { text-shadow: 0 0 6px currentColor; } 50% { text-shadow: 0 0 14px currentColor, 0 0 30px currentColor; } }
+      @keyframes btnGlow {
+        0%,100% { box-shadow: 0 4px 30px rgba(0,229,255,0.4), inset 0 1px 0 rgba(255,255,255,0.15); }
+        50%     { box-shadow: 0 6px 40px rgba(0,229,255,0.55), 0 0 60px rgba(0,229,255,0.15), inset 0 1px 0 rgba(255,255,255,0.2); }
+      }
+      @keyframes orbit1 { 0% { transform: rotate(0deg) translateX(120px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(120px) rotate(-360deg); } }
+      @keyframes orbit2 { 0% { transform: rotate(180deg) translateX(90px) rotate(-180deg); } 100% { transform: rotate(540deg) translateX(90px) rotate(-540deg); } }
+      .play-btn { transition: transform 0.15s ease; }
+      .play-btn:hover { transform: scale(1.05) !important; }
+      .play-btn:active { transform: scale(0.97) !important; }
+      .hero-eq .katex { font-size: clamp(1.3em, 6.5vw, 2em) !important; color: #f0f4ff !important; }
+      .hero-eq .katex-display { margin: 0 !important; }
+      .hero-eq .katex-html { white-space: normal !important; word-break: break-word; }
     `}</style>
 
-    {/* Animated gradient mesh background */}
+    {/* Subtle scanline overlay for arcade texture */}
     <div style={{
-      position: 'absolute', inset: 0,
-      background: 'radial-gradient(ellipse at 20% 50%, rgba(139,92,246,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.05) 0%, transparent 50%)',
-      pointerEvents: 'none',
+      position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1,
+      background: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px)',
     }} />
 
-    {/* Floating math symbols */}
+    {/* Neon gradient mesh — cyan + pink, NOT purple */}
+    <div style={{
+      position: 'absolute', inset: 0, pointerEvents: 'none',
+      background: 'radial-gradient(ellipse at 25% 15%, rgba(0,229,255,0.07) 0%, transparent 50%), radial-gradient(ellipse at 75% 85%, rgba(255,51,102,0.05) 0%, transparent 50%)',
+    }} />
+
+    {/* Orbiting math symbols — neon colors */}
     <div style={{ position: 'absolute', top: '50%', left: '50%', width: 0, height: 0, pointerEvents: 'none' }}>
-      <div style={{ position: 'absolute', animation: 'orbit1 20s linear infinite', fontSize: '18px', opacity: 0.12, color: '#8b5cf6' }}>&#x00D7;</div>
-      <div style={{ position: 'absolute', animation: 'orbit2 15s linear infinite', fontSize: '22px', opacity: 0.1, color: '#6366f1' }}>&#x221A;</div>
-      <div style={{ position: 'absolute', animation: 'orbit3 25s linear infinite', fontSize: '14px', opacity: 0.08, color: '#a78bfa' }}>&#x03C0;</div>
+      <div style={{ position: 'absolute', animation: 'orbit1 18s linear infinite', fontSize: '16px', opacity: 0.15, color: '#00e5ff' }}>&#x03C0;</div>
+      <div style={{ position: 'absolute', animation: 'orbit2 14s linear infinite', fontSize: '20px', opacity: 0.12, color: '#ffea00' }}>&#x221A;</div>
     </div>
 
-    {/* Ambient drift blobs */}
-    <div style={{
-      position: 'absolute', top: '10%', right: '5%', width: '200px', height: '200px',
-      background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
-      borderRadius: '50%', pointerEvents: 'none', animation: 'drift 8s ease-in-out infinite',
-    }} />
-    <div style={{
-      position: 'absolute', bottom: '15%', left: '5%', width: '160px', height: '160px',
-      background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)',
-      borderRadius: '50%', pointerEvents: 'none', animation: 'drift 10s ease-in-out infinite 2s',
-    }} />
-
-    {/* Logo */}
-    <div style={{ animation: 'float 4s ease-in-out infinite, fadeUp 0.6s ease' }}>
+    {/* ── Username hook — first thing they see ── */}
+    <div style={{ animation: 'fadeUp 0.4s ease', marginBottom: '6px', zIndex: 2 }}>
       <div style={{
-        fontSize: '42px', marginBottom: '4px',
-        filter: 'drop-shadow(0 0 20px rgba(139,92,246,0.5))',
-        color: '#a78bfa', fontWeight: 300,
-      }}>&#x222B;</div>
+        fontSize: '12px', fontWeight: 700, color: '#00e5ff', letterSpacing: '1px',
+      }}>
+        u/{username}
+      </div>
+      <div style={{ fontSize: '10px', color: '#3a3d55', marginTop: '2px', letterSpacing: '1px' }}>
+        vs thousands of players &middot; Day #{dayIndex}
+      </div>
     </div>
 
+    {/* ── Title — electric arcade palette ── */}
     <h1 style={{
-      fontSize: '32px', fontWeight: 800, letterSpacing: '5px', marginBottom: '4px',
-      background: 'linear-gradient(135deg, #818cf8 0%, #c084fc 40%, #f472b6 70%, #818cf8 100%)',
+      fontSize: 'clamp(26px, 7.5vw, 36px)', fontWeight: 900, letterSpacing: '5px',
+      margin: '2px 0 8px',
+      background: 'linear-gradient(135deg, #00e5ff 0%, #ffea00 45%, #ff3366 100%)',
       backgroundSize: '200% auto',
       WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-      animation: 'shimmer 4s linear infinite, fadeUp 0.6s ease 0.1s both',
+      animation: 'neonShimmer 3s linear infinite, fadeUp 0.4s ease 0.08s both',
+      lineHeight: 1, zIndex: 2,
     }}>MATHY BLITZ</h1>
 
-    <p style={{
-      fontSize: '10px', color: '#6366f1', marginBottom: '14px', letterSpacing: '5px', fontWeight: 600,
-      animation: 'fadeUp 0.6s ease 0.2s both',
+    {/* ── HERO EQUATION — the billboard centerpiece ── */}
+    <div className="hero-eq" style={{
+      background: 'rgba(0,229,255,0.03)',
+      border: '1px solid rgba(0,229,255,0.12)',
+      borderRadius: '20px', padding: '16px 22px',
+      margin: '4px 0 10px', maxWidth: '340px', width: '100%',
+      position: 'relative', overflow: 'hidden', zIndex: 2,
+      animation: 'fadeUp 0.4s ease 0.16s both, neonPulse 3s ease-in-out infinite 1.2s',
     }}>
-      DAILY CHALLENGE #{dayIndex}
-    </p>
-
-    {/* Today's Mission card */}
-    <div style={{
-      background: `linear-gradient(135deg, ${mission.color}10, ${mission.color}05)`,
-      borderRadius: '16px', padding: '12px 20px',
-      marginBottom: '14px', maxWidth: '300px', width: '100%',
-      border: `1px solid ${mission.color}25`,
-      animation: 'fadeUp 0.6s ease 0.25s both',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-        <span style={{ fontSize: '20px' }} dangerouslySetInnerHTML={{ __html: mission.emoji }} />
-        <div>
-          <div style={{ fontSize: '7px', color: mission.color, letterSpacing: '3px', fontWeight: 700, opacity: 0.7 }}>TODAY'S MISSION</div>
-          <div style={{ fontSize: '13px', fontWeight: 800, color: mission.color }}>{mission.name}</div>
-        </div>
-      </div>
-      <div style={{ fontSize: '10px', color: '#6b7094', lineHeight: 1.4, marginBottom: '6px' }}>
-        {mission.description}
-      </div>
-      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-        <span style={{
-          fontSize: '8px', padding: '2px 7px', borderRadius: '8px',
-          background: `${mission.color}12`, color: mission.color,
-          fontWeight: 700, letterSpacing: '1px',
-        }}>{mission.modifier}</span>
-        {mission.scoreMultiplier !== 1 && (
-          <span style={{
-            fontSize: '8px', padding: '2px 7px', borderRadius: '8px',
-            background: 'rgba(16,185,129,0.08)', color: '#10b981',
-            fontWeight: 700,
-          }}>{mission.scoreMultiplier}x SCORE</span>
-        )}
-        <span style={{
-          fontSize: '8px', padding: '2px 7px', borderRadius: '8px',
-          background: 'rgba(255,255,255,0.04)', color: '#4b5079',
-          fontWeight: 600,
-        }}>{mission.questionCount}Q</span>
-      </div>
-    </div>
-
-    {/* Sample problem card */}
-    <div style={{
-      background: 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
-      borderRadius: '20px', padding: '14px 18px',
-      marginBottom: '14px', maxWidth: '300px', width: '100%',
-      border: '1px solid rgba(255,255,255,0.06)',
-      backdropFilter: 'blur(20px)',
-      animation: 'fadeUp 0.6s ease 0.3s both, pulseGlow 3s ease-in-out infinite',
-      overflow: 'hidden',
-    }}>
-      <div style={{ fontSize: '8px', color: '#a78bfa', letterSpacing: '4px', marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase' }}>
-        Sample Problem
+      {/* Accent line at top */}
+      <div style={{
+        position: 'absolute', top: 0, left: '15%', right: '15%', height: '2px',
+        background: 'linear-gradient(90deg, transparent, #00e5ff, transparent)',
+        opacity: 0.5,
+      }} />
+      <div style={{
+        fontSize: '8px', color: '#00e5ff', letterSpacing: '4px', fontWeight: 700,
+        marginBottom: '10px',
+      }}>
+        CAN YOU SOLVE THIS?
       </div>
       <div style={{
-        fontSize: 'clamp(12px, 3.5vw, 16px)', color: '#e0e7ff', fontWeight: 700, lineHeight: 1.6,
-        overflow: 'hidden', wordBreak: 'break-word' as const, maxWidth: '100%',
+        color: '#f0f4ff', fontWeight: 800, lineHeight: 1.5,
+        overflow: 'hidden', wordBreak: 'break-word' as const,
+        animation: 'typeReveal 1s ease 0.7s both',
+        borderRight: '2px solid transparent',
       }}>
         {sample.latex
-          ? <MathInline tex={sample.question.split('\n')[0]!} />
-          : sample.question.split('\n')[0]
+          ? <MathHero tex={sample.question.split('\n')[0]!} />
+          : <div style={{ fontSize: 'clamp(22px, 6vw, 32px)' }}>{sample.question.split('\n')[0]}</div>
         }
       </div>
-      <div style={{ fontSize: '10px', color: '#4b5079', marginTop: '6px', letterSpacing: '1px' }}>
-        {sample.category} &middot; 4 options &middot; 5 tools available
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+        <span style={{ fontSize: '9px', color: '#00e5ff', letterSpacing: '1px', fontWeight: 600, opacity: 0.7 }}>
+          {sample.category}
+        </span>
+        <span style={{ fontSize: '9px', color: '#3a3d55' }}>&middot;</span>
+        <span style={{ fontSize: '9px', color: '#4a4e6a', letterSpacing: '1px' }}>
+          4 choices &middot; timed
+        </span>
       </div>
     </div>
 
-    {/* Challenge text */}
-    <div style={{ animation: 'fadeUp 0.6s ease 0.4s both' }}>
-      <p style={{
-        fontSize: '14px', color: '#e0e7ff', marginBottom: '4px', maxWidth: '300px',
-        fontWeight: 700, lineHeight: 1.4,
-      }}>
-        How sharp is your math?
-      </p>
-      <p style={{
-        fontSize: '11px', color: '#4b5079', marginBottom: '10px', maxWidth: '260px', lineHeight: 1.5,
-      }}>
-        {context.username ?? 'Challenger'}, every wrong answer reveals the solution. Get graded from F to S rank.
-      </p>
-    </div>
-
-    {/* Feature pills */}
+    {/* ── Grade scale teaser — F through S ── */}
     <div style={{
-      display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center',
-      marginBottom: '14px', maxWidth: '300px',
-      animation: 'fadeUp 0.6s ease 0.45s both',
+      display: 'flex', alignItems: 'center', gap: '3px',
+      marginBottom: '8px', zIndex: 2,
+      animation: 'fadeUp 0.4s ease 0.28s both',
     }}>
-      {['11 Missions', 'Letter Grade', 'Leaderboards', 'Share Scores', 'Level Assessment'].map(f => (
-        <span key={f} style={{
-          fontSize: '8px', padding: '3px 8px', borderRadius: '10px',
-          background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.12)',
-          color: '#818cf8', fontWeight: 600, letterSpacing: '0.5px',
-        }}>{f}</span>
+      {[
+        { g: 'F', c: '#ef4444' }, { g: 'D', c: '#f97316' }, { g: 'C', c: '#fbbf24' },
+        { g: 'B', c: '#38bdf8' }, { g: 'A', c: '#10b981' }, { g: 'S', c: '#ffea00' },
+      ].map(({ g, c }, i) => (
+        <span key={g} style={{ display: 'inline-flex', alignItems: 'center' }}>
+          {i > 0 && <span style={{ color: '#1a1a2a', fontSize: '8px', margin: '0 2px' }}>&rarr;</span>}
+          <span style={{
+            fontSize: g === 'S' ? '15px' : '11px', fontWeight: 800, color: c,
+            animation: g === 'S' ? 'gradeGlow 2s ease infinite' : 'none',
+          }}>{g}</span>
+        </span>
       ))}
+      <span style={{ fontSize: '9px', color: '#3a3d55', marginLeft: '8px', fontWeight: 600 }}>
+        What&apos;s your rank?
+      </span>
     </div>
 
-    {/* Leaderboard teasers */}
-    <div style={{ display: 'flex', gap: '20px', marginBottom: '14px', animation: 'fadeUp 0.6s ease 0.5s both' }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '18px', color: 'rgba(250,204,21,0.6)' }}>&#x2211;</div>
-        <div style={{ fontSize: '8px', color: 'rgba(250,204,21,0.7)', letterSpacing: '2px', fontWeight: 700, marginTop: '4px' }}>TOP SCORES</div>
+    {/* ── Today's Mission — compact pill ── */}
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '8px',
+      padding: '7px 14px', borderRadius: '12px',
+      background: `${mission.color}08`, border: `1px solid ${mission.color}18`,
+      marginBottom: '10px', maxWidth: '300px', zIndex: 2,
+      animation: 'fadeUp 0.4s ease 0.34s both',
+    }}>
+      <span style={{ fontSize: '18px' }} dangerouslySetInnerHTML={{ __html: mission.emoji }} />
+      <div style={{ textAlign: 'left', flex: 1 }}>
+        <div style={{ fontSize: '7px', color: mission.color, letterSpacing: '2px', fontWeight: 700, opacity: 0.7 }}>TODAY&apos;S MISSION</div>
+        <div style={{ fontSize: '12px', fontWeight: 800, color: mission.color }}>{mission.name}</div>
       </div>
-      <div style={{ fontSize: '10px', color: '#1e1e3a', alignSelf: 'center', fontWeight: 700 }}>|</div>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '18px', color: 'rgba(239,68,68,0.6)' }}>&#x2202;</div>
-        <div style={{ fontSize: '8px', color: 'rgba(239,68,68,0.7)', letterSpacing: '2px', fontWeight: 700, marginTop: '4px' }}>BOTTOM</div>
-      </div>
+      {mission.scoreMultiplier !== 1 && (
+        <span style={{
+          fontSize: '9px', padding: '2px 7px', borderRadius: '8px',
+          background: `${mission.color}12`, color: mission.color, fontWeight: 800,
+        }}>{mission.scoreMultiplier}x</span>
+      )}
     </div>
 
-    {/* Play button */}
+    {/* ── PLAY BUTTON — big, neon cyan, pulsing ── */}
     <button
       className="play-btn"
       onClick={e => requestExpandedMode(e.nativeEvent, 'game')}
       style={{
-        padding: '16px 56px',
-        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-        color: '#fff', border: 'none', borderRadius: '14px', fontSize: '14px',
-        fontWeight: 700, letterSpacing: '4px', cursor: 'pointer',
-        boxShadow: '0 4px 30px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        animation: 'fadeUp 0.6s ease 0.6s both',
+        padding: '18px 64px', minHeight: '52px',
+        background: 'linear-gradient(135deg, #00e5ff, #00b8d4)',
+        color: '#050510', border: 'none', borderRadius: '16px',
+        fontSize: '15px', fontWeight: 900, letterSpacing: '5px',
+        cursor: 'pointer', fontFamily: FONT,
+        animation: 'fadeUp 0.4s ease 0.42s both, btnGlow 2.5s ease-in-out infinite 1.5s',
+        position: 'relative', zIndex: 2,
       }}
     >
-      PLAY NOW
+      &#x25B6; PLAY NOW
     </button>
+
+    {/* ── Bottom line — urgency + features ── */}
+    <div style={{
+      fontSize: '9px', color: '#2a2d40', marginTop: '10px', letterSpacing: '2px', zIndex: 2,
+      animation: 'fadeUp 0.4s ease 0.5s both',
+    }}>
+      New mission every 24h &middot; 11 modes &middot; Streak rewards
+    </div>
   </div>
 );
 

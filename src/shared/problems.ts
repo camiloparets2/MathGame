@@ -1570,6 +1570,122 @@ function hardRealWorld(rng: () => number): Problem {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ─── WORD PROBLEM / LOGIC GENERATORS ────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function medMultiStepWord(rng: () => number): Problem {
+  const type = Math.floor(rng() * 4);
+  if (type === 0) {
+    // Profit & loss
+    const buy = (Math.floor(rng() * 10) + 5) * 10;
+    const sellPct = pick([10, 20, 25, 30] as const, rng);
+    const sell = buy + buy * sellPct / 100;
+    const ans = String(sell);
+    return {
+      question: `\\text{Buy at \\$${buy}, sell at ${sellPct}\\% profit. Sell price?}`, answer: '$' + ans,
+      options: opts('$' + ans, ['$' + String(buy + sellPct), '$' + String(sell + 10), '$' + String(buy)], rng),
+      category: 'Word Problems', latex: true,
+      hint: `Profit = ${sellPct}% of cost. Add to cost.`,
+      explanation: `${sellPct}% of $${buy} = $${buy * sellPct / 100}. Sell: $${buy} + $${buy * sellPct / 100} = $${ans}`,
+    };
+  } else if (type === 1) {
+    // Age problem
+    const childAge = Math.floor(rng() * 8) + 5;
+    const parentMult = Math.floor(rng() * 2) + 3; // 3x or 4x
+    const parentAge = childAge * parentMult;
+    const sum = childAge + parentAge;
+    const ans = String(parentAge);
+    return {
+      question: `\\text{Parent is ${parentMult}x child's age. Sum = ${sum}. Parent's age?}`, answer: ans,
+      options: opts(ans, [String(childAge), String(parentAge + childAge), String(sum)], rng),
+      category: 'Word Problems', latex: true,
+      hint: `Let child = x, parent = ${parentMult}x. x + ${parentMult}x = ${sum}`,
+      explanation: `${parentMult + 1}x = ${sum} → x = ${childAge}. Parent = ${parentMult} × ${childAge} = ${ans}`,
+    };
+  } else if (type === 2) {
+    // Mixture cost
+    const priceA = pick([3, 4, 5, 6] as const, rng);
+    const priceB = priceA + pick([2, 3, 4] as const, rng);
+    const kgA = Math.floor(rng() * 4) + 2;
+    const kgB = Math.floor(rng() * 4) + 2;
+    const totalCost = priceA * kgA + priceB * kgB;
+    const ans = String(totalCost);
+    return {
+      question: `\\text{${kgA}kg at \\$${priceA}/kg + ${kgB}kg at \\$${priceB}/kg. Total?}`, answer: '$' + ans,
+      options: opts('$' + ans, ['$' + String(totalCost + priceA), '$' + String(priceA * (kgA + kgB)), '$' + String(totalCost - kgA)], rng),
+      category: 'Word Problems', latex: true,
+      hint: `Total = (${kgA} × $${priceA}) + (${kgB} × $${priceB})`,
+      explanation: `$${priceA * kgA} + $${priceB * kgB} = $${ans}`,
+    };
+  } else {
+    // Work rate
+    const hrsA = pick([2, 3, 4, 5, 6] as const, rng);
+    const hrsB = pick([3, 4, 5, 6, 8] as const, rng);
+    const combined = Math.round(hrsA * hrsB / (hrsA + hrsB) * 10) / 10;
+    const ans = String(combined);
+    return {
+      question: `\\text{A paints in ${hrsA}h, B in ${hrsB}h. Together?}`, answer: ans + ' hrs',
+      options: opts(ans + ' hrs', [String((hrsA + hrsB) / 2) + ' hrs', String(Math.min(hrsA, hrsB)) + ' hrs', String(combined + 1) + ' hrs'], rng),
+      category: 'Logic', latex: true,
+      hint: `Rate A = 1/${hrsA}, Rate B = 1/${hrsB}. Combined rate = sum.`,
+      explanation: `1/${hrsA} + 1/${hrsB} = ${hrsA + hrsB}/${hrsA * hrsB}. Time = ${hrsA * hrsB}/${hrsA + hrsB} = ${ans} hrs`,
+    };
+  }
+}
+
+function hardAppliedLogic(rng: () => number): Problem {
+  const type = Math.floor(rng() * 3);
+  if (type === 0) {
+    // Meeting point
+    const speedA = pick([40, 50, 60] as const, rng);
+    const speedB = pick([50, 60, 80] as const, rng);
+    const dist = (speedA + speedB) * pick([2, 3, 4] as const, rng);
+    const time = dist / (speedA + speedB);
+    const ans = String(time);
+    return {
+      question: `\\text{Two cars ${dist}km apart drive toward each other at ${speedA} and ${speedB} km/h. Meet in?}`,
+      answer: ans + ' hrs',
+      options: opts(ans + ' hrs', [String(time + 1) + ' hrs', String(dist / speedA) + ' hrs', String(time * 2) + ' hrs'], rng),
+      category: 'Logic', latex: true,
+      hint: `Combined speed = ${speedA} + ${speedB} = ${speedA + speedB} km/h`,
+      explanation: `Time = ${dist} / (${speedA} + ${speedB}) = ${dist} / ${speedA + speedB} = ${ans} hrs`,
+    };
+  } else if (type === 1) {
+    // Upstream / downstream
+    const boatSpeed = pick([12, 15, 18, 20] as const, rng);
+    const current = pick([2, 3, 4, 5] as const, rng);
+    const dist = (boatSpeed + current) * pick([2, 3] as const, rng);
+    const downstream = dist / (boatSpeed + current);
+    const upstream = dist / (boatSpeed - current);
+    const totalTime = Math.round((downstream + upstream) * 10) / 10;
+    const ans = String(totalTime);
+    return {
+      question: `\\text{Boat: ${boatSpeed}km/h, current: ${current}km/h. Round trip ${dist}km each way. Total time?}`,
+      answer: ans + ' hrs',
+      options: opts(ans + ' hrs', [String(2 * dist / boatSpeed) + ' hrs', String(totalTime + 1) + ' hrs', String(downstream * 2) + ' hrs'], rng),
+      category: 'Word Problems', latex: true,
+      hint: `Downstream speed = ${boatSpeed + current}, upstream = ${boatSpeed - current}`,
+      explanation: `Down: ${dist}/${boatSpeed + current} = ${downstream}h. Up: ${dist}/${boatSpeed - current} = ${upstream}h. Total: ${ans}h`,
+    };
+  } else {
+    // Coin/bill denomination
+    const numQuarters = Math.floor(rng() * 6) + 4;
+    const numDimes = Math.floor(rng() * 8) + 3;
+    const total = numQuarters * 25 + numDimes * 10;
+    const totalDollars = (total / 100).toFixed(2);
+    const ans = String(numQuarters + numDimes);
+    return {
+      question: `\\text{Only quarters and dimes totaling \\$${totalDollars}. ${numQuarters} quarters. How many coins total?}`,
+      answer: ans,
+      options: opts(ans, [String(+ans + 2), String(numDimes), String(+ans - 1)], rng),
+      category: 'Logic', latex: true,
+      hint: `${numQuarters} quarters = $${(numQuarters * 0.25).toFixed(2)}. Remainder in dimes.`,
+      explanation: `${numQuarters} quarters = $${(numQuarters * 0.25).toFixed(2)}. Remaining $${(numDimes * 0.10).toFixed(2)} = ${numDimes} dimes. Total: ${ans} coins`,
+    };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ─── ALGEBRA SPRINT GENERATORS ──────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1917,6 +2033,7 @@ const MEDIUM_GEN = [
   medPemdas, medFractionOps, medWordProblem,
   medDataInterpret, medPercentComparison, medLogicReasoning,
   medNumberTheory, medAlgebraSystem, medQuadraticFactor,
+  medMultiStepWord,
 ];
 
 const HARD_GEN = [
@@ -1926,7 +2043,7 @@ const HARD_GEN = [
   hardDataAnalysis, hardExponents,
   hardScientific, hardNegatives,
   hardLogicPuzzle, hardMentalMath, hardRealWorld,
-  hardNumberTheory, hardAlgebraSprint,
+  hardNumberTheory, hardAlgebraSprint, hardAppliedLogic,
 ];
 
 // Category-filtered generators

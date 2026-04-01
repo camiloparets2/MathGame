@@ -107,6 +107,8 @@ export const EASY_PROBLEMS: Problem[] = [
     hint: "Let Ali = x, Tom = 2x. Sum = 36.", explanation: "3x = 36 → x = 12. Tom = 24" },
   { question: "\\text{A rectangle's perimeter is 34. Width is 7. Length?}", options: ["10", "13", "17", "20"], answer: "10", category: "Geometry", latex: true,
     hint: "P = 2(l + w). Solve for l.", explanation: "34 = 2(l + 7) → l + 7 = 17 → l = 10" },
+  { question: "\\text{Solve: } 2x + 3 = 11. \\quad x = ?", options: ["4", "3", "5", "2"], answer: "4", category: "Algebra", latex: true,
+    hint: "Subtract 3, then divide by 2", explanation: "2x = 8, x = 4" },
 ];
 
 export const MEDIUM_PROBLEMS: Problem[] = [
