@@ -109,6 +109,16 @@ export const EASY_PROBLEMS: Problem[] = [
     hint: "P = 2(l + w). Solve for l.", explanation: "34 = 2(l + 7) → l + 7 = 17 → l = 10" },
   { question: "\\text{Solve: } 2x + 3 = 11. \\quad x = ?", options: ["4", "3", "5", "2"], answer: "4", category: "Algebra", latex: true,
     hint: "Subtract 3, then divide by 2", explanation: "2x = 8, x = 4" },
+
+  // ── Equations & Algebra (Easy) ─────────────────────────────────────────────
+  { question: "5x = 35. \\quad x = ?", options: ["7", "6", "8", "5"], answer: "7", category: "Equations", latex: true,
+    hint: "Divide both sides by 5", explanation: "x = 35 ÷ 5 = 7" },
+  { question: "x - 9 = 14. \\quad x = ?", options: ["23", "5", "22", "24"], answer: "23", category: "Equations", latex: true,
+    hint: "Add 9 to both sides", explanation: "x = 14 + 9 = 23" },
+  { question: "\\frac{x}{4} = 8. \\quad x = ?", options: ["32", "2", "12", "28"], answer: "32", category: "Equations", latex: true,
+    hint: "Multiply both sides by 4", explanation: "x = 8 × 4 = 32" },
+  { question: "\\text{Rectangle: length 14m, width 6m. Area?}", options: ["84 m²", "20 m²", "40 m²", "168 m²"], answer: "84 m²", category: "Geometry", latex: true,
+    hint: "Area = length × width", explanation: "14 × 6 = 84 m²" },
 ];
 
 export const MEDIUM_PROBLEMS: Problem[] = [
@@ -251,6 +261,12 @@ export const HARD_PROBLEMS: Problem[] = [
     hint: "By Vieta's: product of roots = c/a", explanation: "Roots are 3 and 4. Product = 12 (or c/a = 12/1)" },
   { question: "\\text{Simplify: } \\frac{x^2 - 9}{x + 3}", options: ["x - 3", "x + 3", "x^2 - 3", "x - 9"], answer: "x - 3", category: "Algebra", latex: true,
     hint: "Factor numerator: difference of squares", explanation: "(x+3)(x-3)/(x+3) = x - 3" },
+  { question: "x^2 + 5x + 6 = 0. \\quad x_1 + x_2 = ?", options: ["-5", "5", "-6", "6"], answer: "-5", category: "Quadratics", latex: true,
+    hint: "Sum of roots = -b/a", explanation: "Roots: -2, -3. Sum = -5 (or -b/a = -5/1)" },
+  { question: "|2x - 6| = 10. \\quad \\text{Larger solution?}", options: ["8", "-2", "3", "10"], answer: "8", category: "Equations", latex: true,
+    hint: "Two cases: 2x-6=10 and 2x-6=-10", explanation: "2x=16 → x=8, or 2x=-4 → x=-2. Larger = 8" },
+  { question: "f(x) = 3x^2 - 2. \\quad f(4) = ?", options: ["46", "48", "44", "50"], answer: "46", category: "Algebra", latex: true,
+    hint: "Substitute x = 4", explanation: "3(16) - 2 = 48 - 2 = 46" },
 
   // ── Combinatorics ─────────────────────────────────────────────────────────────
   { question: "\\text{8 people, choose a committee of 3. Ways?}", options: ["56", "336", "24", "40320"], answer: "56", category: "Combinatorics", latex: true,
@@ -345,10 +361,18 @@ export const HARD_PROBLEMS: Problem[] = [
     hint: "When B has run 900m, A runs 1000m. With 100m start, when B runs 1000m, how far does A run?", explanation: "A's speed ratio = 1000:900 = 10:9. With head start: A runs 900m while B runs 900m, so A arrives first. A wins." },
   { question: "\\text{5 workers complete a job in 12 days. How many days for 9 workers?}", options: ["6.67 days", "8 days", "10 days", "4 days"], answer: "6.67 days", category: "Word Problems", latex: true,
     hint: "Inverse proportion: workers × days = constant", explanation: "5 × 12 = 60 worker-days. 60 ÷ 9 = 6.67 days" },
-  { question: "\\text{A ladder 10m long leans against a wall. Base is 6m from wall. Height reached?}", options: ["8 m", "7 m", "9 m", "6 m"], answer: "8 m", category: "Logic", latex: true,
-    hint: "Pythagorean theorem: a² + b² = c²", explanation: "h² + 6² = 10². h² = 100 - 36 = 64. h = 8 m" },
+  { question: "\\text{Clock shows 3:15. Angle between hands?}", options: ["7.5°", "0°", "15°", "90°"], answer: "7.5°", category: "Logic", latex: true,
+    hint: "Hour hand moves 0.5° per minute from the hour mark", explanation: "Hour hand: 90° + 15×0.5° = 97.5°. Minute: 90°. Angle = 7.5°" },
   { question: "\\text{A 20\\% salt solution + 50\\% salt solution = 30L of 30\\% solution. How much 20\\% solution?}", options: ["20 L", "10 L", "15 L", "25 L"], answer: "20 L", category: "Algebra", latex: true,
     hint: "Let x = amount of 20% solution. Set up: 0.2x + 0.5(30-x) = 0.3(30)", explanation: "0.2x + 15 - 0.5x = 9. -0.3x = -6. x = 20 L" },
   { question: "\\text{Sequence: } a_n = 2n^2 - 1. \\quad a_5 = ?", options: ["49", "51", "47", "25"], answer: "49", category: "Algebra", latex: true,
     hint: "Substitute n = 5 into the formula", explanation: "a₅ = 2(5²) - 1 = 2(25) - 1 = 50 - 1 = 49" },
+
+  // ── Hard Algebra / Equations ───────────────────────────────────────────────
+  { question: "x^2 - 5x - 14 = 0. \\quad \\text{Positive root?}", options: ["7", "2", "5", "14"], answer: "7", category: "Quadratics", latex: true,
+    hint: "Factor: (x-7)(x+2) = 0", explanation: "Roots: 7 and -2. Positive root = 7" },
+  { question: "\\text{If } f(x) = x^3 - 8, \\text{ solve } f(x) = 0.", options: ["2", "4", "8", "-2"], answer: "2", category: "Algebra", latex: true,
+    hint: "x³ = 8. Cube root of 8?", explanation: "x³ = 8 → x = ∛8 = 2" },
+  { question: "\\text{System: } x+y=10, \\; 2x-y=5. \\quad x = ?", options: ["5", "3", "7", "4"], answer: "5", category: "Algebra", latex: true,
+    hint: "Add the two equations to eliminate y", explanation: "3x = 15 → x = 5. Then y = 5." },
 ];

@@ -374,8 +374,18 @@ function opts(correct: string, wrong: string[], rng: () => number): string[] {
   const uniq = [...new Set(wrong.filter(w => w !== correct && w.trim() !== ''))];
   let pad = 1;
   while (uniq.length < 3) {
-    const cand = String(Number(correct) + pad++);
-    if (!uniq.includes(cand) && cand !== correct) uniq.push(cand);
+    // Extract the numeric core and any prefix/suffix (e.g. "$", " hrs")
+    const numMatch = correct.match(/^([^0-9.-]*)(-?[\d.]+)(.*)$/);
+    if (numMatch) {
+      const [, prefix, numStr, suffix] = numMatch;
+      const cand = `${prefix}${Number(numStr) + pad++}${suffix}`;
+      if (!uniq.includes(cand) && cand !== correct) uniq.push(cand);
+    } else {
+      // Truly non-numeric — just add generic alternatives
+      const cand = `${correct} (${pad++})`;
+      if (!uniq.includes(cand)) uniq.push(cand);
+    }
+    if (pad > 20) break; // safety valve
   }
   return shuffle([correct, ...uniq.slice(0, 3)], rng);
 }
@@ -1636,11 +1646,12 @@ function medMultiStepWord(rng: () => number): Problem {
 function hardAppliedLogic(rng: () => number): Problem {
   const type = Math.floor(rng() * 3);
   if (type === 0) {
-    // Meeting point
+    // Meeting point — pick distance independently for a non-trivial division
     const speedA = pick([40, 50, 60] as const, rng);
     const speedB = pick([50, 60, 80] as const, rng);
-    const dist = (speedA + speedB) * pick([2, 3, 4] as const, rng);
-    const time = dist / (speedA + speedB);
+    const combined = speedA + speedB;
+    const time = pick([2, 3, 4, 5] as const, rng);
+    const dist = combined * time;
     const ans = String(time);
     return {
       question: `\\text{Two cars ${dist}km apart drive toward each other at ${speedA} and ${speedB} km/h. Meet in?}`,
@@ -1651,21 +1662,22 @@ function hardAppliedLogic(rng: () => number): Problem {
       explanation: `Time = ${dist} / (${speedA} + ${speedB}) = ${dist} / ${speedA + speedB} = ${ans} hrs`,
     };
   } else if (type === 1) {
-    // Upstream / downstream
-    const boatSpeed = pick([12, 15, 18, 20] as const, rng);
-    const current = pick([2, 3, 4, 5] as const, rng);
-    const dist = (boatSpeed + current) * pick([2, 3] as const, rng);
-    const downstream = dist / (boatSpeed + current);
-    const upstream = dist / (boatSpeed - current);
+    // Upstream / downstream — use LCM-friendly distances for clean answers
+    const boatSpeed = pick([15, 18, 20, 24] as const, rng);
+    const current = pick([3, 4, 5] as const, rng);
+    const effective = boatSpeed - current; // always > 0 (min 10)
+    const dist = effective * (boatSpeed + current); // LCM of both speeds — guarantees integer downstream AND upstream
+    const downstream = Math.round(dist / (boatSpeed + current) * 10) / 10;
+    const upstream = Math.round(dist / effective * 10) / 10;
     const totalTime = Math.round((downstream + upstream) * 10) / 10;
     const ans = String(totalTime);
     return {
       question: `\\text{Boat: ${boatSpeed}km/h, current: ${current}km/h. Round trip ${dist}km each way. Total time?}`,
       answer: ans + ' hrs',
-      options: opts(ans + ' hrs', [String(2 * dist / boatSpeed) + ' hrs', String(totalTime + 1) + ' hrs', String(downstream * 2) + ' hrs'], rng),
+      options: opts(ans + ' hrs', [String(Math.round(2 * dist / boatSpeed * 10) / 10) + ' hrs', String(totalTime + 1) + ' hrs', String(downstream * 2) + ' hrs'], rng),
       category: 'Word Problems', latex: true,
       hint: `Downstream speed = ${boatSpeed + current}, upstream = ${boatSpeed - current}`,
-      explanation: `Down: ${dist}/${boatSpeed + current} = ${downstream}h. Up: ${dist}/${boatSpeed - current} = ${upstream}h. Total: ${ans}h`,
+      explanation: `Down: ${dist}/${boatSpeed + current} = ${downstream}h. Up: ${dist}/${effective} = ${upstream}h. Total: ${ans}h`,
     };
   } else {
     // Coin/bill denomination
